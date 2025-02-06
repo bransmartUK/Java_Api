@@ -21,8 +21,8 @@ import jakarta.persistence.Table;
  * @author bransmartuk
  */
 @Entity
-@Table(name = "users")
-public class Users {
+@Table(name = "user")
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -35,10 +35,10 @@ public class Users {
     @Enumerated(EnumType.STRING)
     private State state;
 
-    public Users(){
+    public User(){
     }
 
-    public Users(String name, Integer age, String hairColor, Status status, State state) {
+    public User(String name, Integer age, String hairColor, Status status, State state) {
         this.name = name;
         this.age = age;
         this.hairColor = hairColor;

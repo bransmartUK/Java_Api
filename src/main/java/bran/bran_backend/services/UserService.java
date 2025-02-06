@@ -16,8 +16,8 @@ import org.springframework.stereotype.Service;
 
 import bran.bran_backend.enums.State;
 import bran.bran_backend.enums.Status;
-import bran.bran_backend.models.Users;
-import bran.bran_backend.repositories.UsersRepository;
+import bran.bran_backend.models.User;
+import bran.bran_backend.repositories.UserRepository;
 
 /**
  *
@@ -27,15 +27,15 @@ import bran.bran_backend.repositories.UsersRepository;
 public class UserService {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
-    private final UsersRepository userRepository;
-    public UserService(UsersRepository userRepository){
+    private final UserRepository userRepository;
+    public UserService(UserRepository userRepository){
         this.userRepository = userRepository;
     }
 
-    public List<Users> GetUsers() {
+    public List<User> getUsers() {
         try {
             logger.info("Getting all users");
-            List<Users> users = this.userRepository.findAll();
+            List<User> users = this.userRepository.findAll();
             return users;
         } catch (Exception e) {
             logger.error("Error in Repository trying to grab all users", e);
@@ -43,59 +43,64 @@ public class UserService {
         }
     }
 
-    public List<Users> GetPendingUsers() {
-        List<Users> pendingUsers = this.GetUsers().stream().filter(Users -> Users.getStatus() == Status.PENDING).collect(Collectors.toList());
+    public List<User> getPendingUsers() {
+        List<User> pendingUsers = this.getUsers().stream().filter(Users -> Users.getStatus() == Status.PENDING).collect(Collectors.toList());
         return new ArrayList<>(pendingUsers);
     }
 
-    public Users GetUserById(Long id) {
-        Users Users = this.GetUsers().stream().filter(acquiredUser -> Objects.equals(acquiredUser.getId(), id)).findFirst().orElse(null);
-        return Users;
+    public User getUserById(Long id) {
+        User user = this.getUsers().stream().filter(acquiredUser -> Objects.equals(acquiredUser.getId(), id)).findFirst().orElse(null);
+        return user;
     }
 
-    public void ActivateUser(Long id) {
-        Users Users = this.GetUsers().stream().filter(acquiredUser -> Objects.equals(acquiredUser.getId(), id)).findFirst().orElse(null);
-        if (Users != null) {
-            Users.setState(State.ACTIVATED);
+    public void activateUser(Long id) {
+        User user = this.getUsers().stream().filter(acquiredUser -> Objects.equals(acquiredUser.getId(), id)).findFirst().orElse(null);
+        if (user != null) {
+            user.setState(State.ACTIVATED);
         } else {
             logger.error("Users not found");
         }
     }
 
-    public void DeactivateUser(Long id) {
-        Users Users = this.GetUsers().stream().filter(acquiredUser -> Objects.equals(acquiredUser.getId(), id)).findFirst().orElse(null);
-        if (Users != null) {
-            Users.setState(State.DEACTIVATED);
+    public void deactivateUser(Long id) {
+        User user = this.getUsers().stream().filter(acquiredUser -> Objects.equals(acquiredUser.getId(), id)).findFirst().orElse(null);
+        if (user != null) {
+            user.setState(State.DEACTIVATED);
         } else {
             logger.error("Users not found");
         }
     }
 
-    public void RejectUser(Long id) {
-        Users Users = this.GetUsers().stream().filter(acquiredUser -> Objects.equals(acquiredUser.getId(), id)).findFirst().orElse(null);
-        if (Users != null) {
-            Users.setStatus(Status.REJECTED);
+    public void rejectUser(Long id) {
+        User user = this.getUsers().stream().filter(acquiredUser -> Objects.equals(acquiredUser.getId(), id)).findFirst().orElse(null);
+        if (user != null) {
+            user.setStatus(Status.REJECTED);
         } else {
             logger.error("Users not found");
         }
     }
 
-    public void UpdateUser(Users newUser) {
-        Users oldUser = this.GetUsers().stream().filter(Users -> Objects.equals(Users.getId(), newUser.getId())).findFirst().orElse(null);
-        if (oldUser != null) {
+    public void updateUser(User newUser) {
+        try {
+            User oldUser = this.getUsers().stream().filter(Users -> Objects.equals(Users.getId(), newUser.getId())).findFirst().orElse(null);
+        if (oldUser != null && !oldUser.equals(newUser)) {
             oldUser.setName(newUser.getName());
             oldUser.setAge(newUser.getAge());
             oldUser.setHairColor(newUser.getHairColor());
             oldUser.setStatus(newUser.getStatus());
+            this.userRepository.save(oldUser);
         } else {
-            logger.error("Users not found");
+            logger.error("Users not found or no changes made");
+        }
+        } catch (Exception e) {
+            logger.error("Error in Repository trying to update user", e);
         }
     }
 
-    public Users CreateUser(Users newUser) {
+    public User createUser(User newUser) {
         try {
             logger.info("Creating new user");
-            Users createdUser = this.userRepository.save(newUser);
+            User createdUser = this.userRepository.save(newUser);
             return createdUser;
         } catch (Exception e) {
             logger.error("Error in Repository trying to create new user", e);
