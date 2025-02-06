@@ -14,6 +14,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 /**
@@ -35,15 +37,20 @@ public class User {
     @Enumerated(EnumType.STRING)
     private State state;
 
+    @ManyToOne
+    @JoinColumn(name = "group_id")
+    private Group group;
+
     public User(){
     }
 
-    public User(String name, Integer age, String hairColor, Status status, State state) {
+    public User(String name, Integer age, String hairColor, Status status, State state, Group group) {
         this.name = name;
         this.age = age;
         this.hairColor = hairColor;
         this.status = status;
         this.state = state;
+        this.group = group;
     }
 
     public Long getId() { return id; }
@@ -63,5 +70,13 @@ public class User {
 
     public State getState() { return state; }
     public void setState(State state) { this.state = state; }
+
+    public Group getGroup() {
+        return group;
+    }
+
+    public void setGroup(Group group) {
+        this.group = group;
+    }
 
 }

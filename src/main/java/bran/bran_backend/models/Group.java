@@ -5,10 +5,14 @@
 
 package bran.bran_backend.models;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 /**
@@ -24,6 +28,9 @@ public class Group {
     String name;
     String description;
     String location;
+
+    @OneToMany(mappedBy = "group")
+    private Set<User> users = new HashSet<>();
 
     public Group() {
     }
@@ -64,6 +71,14 @@ public class Group {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public Set<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(Set<User> users) {
+        this.users = users;
     }
 
 }
